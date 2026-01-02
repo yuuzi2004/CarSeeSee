@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>车辆危险驾驶检测</title>
+    <style>
+        :root{
+            --铜绿: #549688;
+            --蒸栗: #f4eac5;
+            --铜绿深: #3d6d62;
+            --铜绿浅: #7fb3a8;
+            --蒸栗深: #e8d4a0;
+            --主文字: #2d4b3d;
+            --副文字: #5a7a6d;
+            --白: #ffffff;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        html{
+            height:100%;
+            width:100%;
+        }
+        body{
+            min-height:100vh;
+            width:100%;
+            font-family:"Segoe UI","Microsoft YaHei",sans-serif;
+            background:var(--蒸栗);
+            background-image:radial-gradient(ellipse 120% 100% at 50% 0%, 
+                var(--铜绿) 0%, 
+                rgba(132,180,170,0.6) 40%,
+                rgba(244,234,197,0.8) 70%,
+                var(--蒸栗) 100%);
+            background-attachment:fixed;
+            background-size:100% 100%;
+            background-repeat:no-repeat;
+            display:flex;
+            flex-direction:column;
+            position:relative;
+            overflow-x:hidden;
+        }
+        
+        /* 背景装饰动画 */
+        body::before{
+            content:'';
+            position:fixed;
+            top:-50%;
+            left:-50%;
+            width:200%;
+            height:200%;
+            background:radial-gradient(circle, rgba(84,150,136,0.05) 1px, transparent 1px);
+            background-size:50px 50px;
+            animation:float 20s infinite linear;
+            pointer-events:none;
+            z-index:0;
+        }
+        @keyframes float{
+            0%{transform:translate(0,0) rotate(0deg);}
+            100%{transform:translate(-50px,-50px) rotate(360deg);}
+        }
+        
+        /* 导航栏 */
+        .navbar{
+            width:100%;
+            background:rgba(255,255,255,0.9);
+            backdrop-filter:blur(10px);
+            border-bottom:1px solid rgba(84,150,136,0.2);
+            padding:15px 0;
+            box-shadow:0 2px 10px rgba(84,150,136,.1);
+        }
+        .nav-container{
+            max-width:1200px;
+            margin:0 auto;
+            padding:0 30px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+        .nav-title{
+            font-size:24px;
+            font-weight:700;
+            color:var(--铜绿深);
+            letter-spacing:1px;
+            text-align:center;
+        }
+        
+        /* 主内容区 */
+        .main-container{
+            flex:1;
+            width:100%;
+            max-width:1200px;
+            margin:0 auto;
+            padding:40px 30px;
+        }
+        .content-section{
+            background:rgba(255,255,255,0.85);
+            border-radius:12px;
+            padding:40px;
+            margin-bottom:30px;
+            box-shadow:0 4px 20px rgba(84,150,136,.15);
+        }
+        .header{
+            text-align:center;
+            margin-bottom:40px;
+            padding-bottom:30px;
+            border-bottom:2px solid rgba(84,150,136,0.1);
+        }
+        .header h1{
+            font-size:32px;
+            letter-spacing:1px;
+            color:var(--铜绿深);
+            margin-bottom:12px;
+            font-weight:700;
+            text-align:center;
+        }
+        .header p{
+            font-size:16px;
+            color:var(--副文字);
+        }
+
+        /* 按钮区：并排 + 完全等大 + 文字居中 */
+        .btn-row{
+            display:flex;justify-content:center;gap:20px;
+            flex-wrap:wrap;
+        }
+        .btn{
+            width:160px;height:44px;border:none;border-radius:22px;
+            font-size:16px;font-weight:500;cursor:pointer;transition:all .3s ease;
+            box-shadow:0 4px 12px rgba(84,150,136,.15);
+            display:flex;align-items:center;justify-content:center;
+            position:relative;
+            overflow:hidden;
+        }
+        .btn-primary{
+            background:linear-gradient(135deg, var(--铜绿) 0%, var(--铜绿深) 100%);
+            color:var(--白);
+        }
+        .btn-primary:hover{
+            background:linear-gradient(135deg, var(--铜绿深) 0%, var(--铜绿) 100%);
+            box-shadow:0 6px 16px rgba(84,150,136,.25);
+            transform:translateY(-2px);
+        }
+        .btn-secondary{
+            background:rgba(244,234,197,0.8);
+            color:var(--铜绿深);
+            border:2px solid var(--铜绿浅);
+        }
+        .btn-secondary:hover{
+            background:var(--蒸栗深);
+            border-color:var(--铜绿);
+            box-shadow:0 6px 16px rgba(84,150,136,.2);
+            transform:translateY(-2px);
+        }
+
+        /* 结果区 */
+        .result-area{
+            display:flex;
+            flex-direction:column;
+            gap:25px;
+        }
+        .result-title{
+            font-size:20px;
+            color:var(--铜绿深);
+            font-weight:600;
+            margin-bottom:10px;
+            text-align:center;
+        }
+        .result-img-box{
+            width:100%;
+            min-height:400px;
+            border-radius:8px;
+            border:2px solid rgba(84,150,136,0.2);
+            background:rgba(244,234,197,0.2);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            overflow:hidden;
+        }
+        .result-img-box img{
+            max-width:100%;
+            max-height:600px;
+            object-fit:contain;
+            border-radius:8px;
+        }
+        .status-tag{
+            padding:10px 28px;border-radius:24px;font-size:16px;font-weight:600;
+            box-shadow:0 2px 8px rgba(0,0,0,.1);
+        }
+        .safe{
+            background:linear-gradient(135deg, rgba(84,150,136,0.15) 0%, rgba(84,150,136,0.25) 100%);
+            color:var(--铜绿深);
+            border:2px solid var(--铜绿浅);
+        }
+        .danger{
+            background:linear-gradient(135deg, rgba(220,53,69,0.15) 0%, rgba(220,53,69,0.25) 100%);
+            color:#c03545;
+            border:2px solid #e85d6d;
+        }
+        .msg{
+            font-size:16px;
+            color:var(--铜绿深);
+            margin-top:10px;
+            padding:12px 20px;
+            background:rgba(244,234,197,0.5);
+            border-radius:12px;
+            border-left:4px solid var(--铜绿);
+        }
+        .empty-txt{
+            color:var(--副文字);
+            font-size:15px;
+            text-align:center;
+            line-height:1.6;
+        }
+        
+        /* 页脚 */
+        .footer{
+            width:100%;
+            background:rgba(255,255,255,0.7);
+            border-top:1px solid rgba(84,150,136,0.2);
+            padding:20px 0;
+            margin-top:auto;
+            text-align:center;
+            color:var(--副文字);
+            font-size:14px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-container{
+                padding:20px 15px;
+            }
+            .content-section{
+                padding:25px 20px;
+            }
+            .nav-container{
+                padding:0 20px;
+            }
+            .nav-title{
+                font-size:20px;
+            }
+            .header h1{
+                font-size:24px;
+            }
+            .header p{
+                font-size:14px;
+            }
+            .btn-row{
+                flex-direction:column;
+                align-items:stretch;
+            }
+            .btn{
+                width:100%;
+            }
+            .result-img-box{
+                min-height:300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-title">车辆危险驾驶检测系统</div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="main-container">
+        <div class="content-section">
+            <div class="header">
+                <h1>车辆危险驾驶检测</h1>
+                <p>上传图片 / 视频，自动识别危险驾驶行为并框选危险区域</p>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" action="/detect">
+                <div class="btn-row">
+                    <!-- 隐藏原生 input，用 label 当按钮 -->
+                    <input type="file" id="fileInput" name="file" accept="image/*,video/*" required style="display:none;"/>
+                    <label for="fileInput" class="btn btn-secondary">选择文件</label>
+                    <button type="submit" class="btn btn-primary">开始检测</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-section">
+            <div class="result-area">
+                <div class="result-title">检测结果</div>
+                <div class="result-img-box">
+                    <div th:if="${detectionImage}"><img th:src="${detectionImage}" alt="检测结果"/></div>
+                    <div th:unless="${detectionImage}"><span class="empty-txt">检测结果图片将在此处显示<br/>危险区域会被自动框选标注</span></div>
+                </div>
+                <div th:if="${safetyStatus == 'safe'}" class="status-tag safe">✅ 检测安全 - 未发现危险驾驶行为</div>
+                <div th:if="${safetyStatus == 'danger'}" class="status-tag danger">⚠️ 检测危险 - 发现危险驾驶行为</div>
+                <div th:unless="${safetyStatus}" style="display:none;"></div>
+                <div class="msg" th:if="${msg}">[[${msg}]]</div>
+                <div th:unless="${msg}" class="empty-txt">请上传文件并点击检测按钮开始分析</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>© 2024 车辆危险驾驶检测系统 | 基于深度学习技术</p>
+    </footer>
+</body>
+</html>
