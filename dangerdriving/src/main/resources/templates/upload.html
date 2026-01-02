@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>车辆危险驾驶检测</title>
+    <style>
+        :root{
+            --粉: #ffeef7;
+            --蓝: #e6f4ff;
+            --灰: #f0f2f5;
+            --灰深: #c9d0db;
+            --主文字: #2d4b8c;
+            --副文字: #6b82b9;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        html,body{
+            min-height:100vh;
+            font-family:"Segoe UI","Microsoft YaHei",sans-serif;
+            background:linear-gradient(135deg, var(--粉) 0%, var(--蓝) 100%);
+            display:flex;justify-content:center;align-items:center;
+            padding:40px 20px;
+        }
+        .web-card{
+            width:100%; max-width:800px;
+            background:rgba(255,255,255,0.65);
+            backdrop-filter:blur(12px);
+            border-radius:24px;
+            border:1px solid rgba(255,255,255,0.5);
+            box-shadow:0 12px 40px rgba(150,170,220,.25);
+            padding:50px 60px;
+            display:flex;flex-direction:column;gap:40px;
+        }
+        .header{text-align:center;}
+        .header h1{font-size:36px;letter-spacing:1px;color:var(--主文字);margin-bottom:8px;}
+        .header p{font-size:16px;color:var(--副文字);}
+
+        /* 按钮区：并排 + 完全等大 + 文字居中 */
+        .btn-row{
+            display:flex;justify-content:center;gap:20px;
+        }
+        .btn{
+            width:160px;height:44px;border:none;border-radius:22px;
+            font-size:16px;font-weight:500;cursor:pointer;transition:.3s;
+            box-shadow:0 4px 12px rgba(0,0,0,.08);
+            display:flex;align-items:center;justify-content:center;   /* 文字绝对居中 */
+        }
+        .btn-gray{background:var(--灰);color:var(--主文字);}
+        .btn-gray:hover{background:var(--灰深);}
+
+        /* 结果区 */
+        .result-area{display:flex;flex-direction:column;align-items:center;gap:20px;}
+        .result-title{font-size:22px;color:var(--主文字);font-weight:600;}
+        .result-img-box{
+            width:100%;height:320px;border-radius:16px;
+            border:1px solid rgba(255,255,255,0.6);
+            background:rgba(255,255,255,0.4);
+            display:flex;align-items:center;justify-content:center;
+        }
+        .result-img-box img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;}
+        .status-tag{
+            padding:8px 24px;border-radius:24px;font-size:16px;font-weight:600;
+        }
+        .safe{background:rgba(232,248,240,0.7);color:#2e8b57;border:1px solid #d4ecd9;}
+        .danger{background:rgba(255,240,240,0.7);color:#dc143c;border:1px solid #ffd6d6;}
+        .msg{font-size:16px;color:var(--主文字);margin-top:10px;}
+        .empty-txt{color:var(--副文字);font-size:15px;}
+    </style>
+</head>
+<body>
+<div class="web-card">
+    <div class="header">
+        <h1>车辆危险驾驶检测</h1>
+        <p>上传图片 / 视频，自动识别危险驾驶行为并框选危险区域</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" action="/detect">
+        <div class="btn-row">
+            <!-- 隐藏原生 input，用 label 当按钮 -->
+            <input type="file" id="fileInput" name="file" accept="image/*,video/*" required style="display:none;"/>
+            <label for="fileInput" class="btn btn-gray">选择文件</label>
+            <button type="submit" class="btn btn-gray">开始检测</button>
+        </div>
+    </form>
+
+    <div class="result-area">
+        <div class="result-title">检测结果</div>
+        <div class="result-img-box">
+            <div th:if="${detectionImage}"><img th:src="${detectionImage}" alt="检测结果"/></div>
+            <div th:unless="${detectionImage}"><span class="empty-txt">检测结果图片将在此处显示<br/>危险区域会被自动框选标注</span></div>
+        </div>
+        <div th:if="${safetyStatus == 'safe'}" class="status-tag safe">✅ 检测安全 - 未发现危险驾驶行为</div>
+        <div th:if="${safetyStatus == 'danger'}" class="status-tag danger">⚠️ 检测危险 - 发现危险驾驶行为</div>
+        <div th:unless="${safetyStatus}" style="display:none;"></div>
+        <div class="msg" th:if="${msg}">[[${msg}]]</div>
+        <div th:unless="${msg}" class="empty-txt">请上传文件并点击检测按钮开始分析</div>
+    </div>
+</div>
+</body>
+</html>
