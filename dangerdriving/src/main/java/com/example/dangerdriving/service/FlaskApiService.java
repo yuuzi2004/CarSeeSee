@@ -99,13 +99,11 @@ public class FlaskApiService {
                     result.put("count", jsonNode.has("count") ? jsonNode.get("count").asInt() : 0);
                     result.put("success", true);
                     
-                    // 判断是否有危险行为
+                    // 判断是否有危险行为（除了 normal_driving 都是危险行为）
                     boolean hasDanger = false;
                     for (Map<String, Object> detection : detections) {
                         String className = (String) detection.get("className");
-                        // 根据类别名称判断是否为危险行为（除了 normal_driving 都是危险行为）
-                        if (className != null && !className.equals("normal_driving") && !className.equals("sudden_acceleration") && 
-                            !className.equals("sudden_brake") && !className.equals("sharp_turn")) {
+                        if (className != null && !className.equals("normal_driving")) {
                             hasDanger = true;
                             break;
                         }
@@ -123,10 +121,6 @@ public class FlaskApiService {
         }
     }
 
-    /**
-     * 健康检查
-     * 检查 Flask API 服务是否可用
-     */
     public boolean healthCheck() {
         try {
             String url = flaskApiConfig.getHealthUrl();

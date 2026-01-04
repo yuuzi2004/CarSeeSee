@@ -1,12 +1,15 @@
 package com.example.dangerdriving;
 
 import com.example.dangerdriving.service.FlaskApiService;
+import com.example.dangerdriving.util.DetectionNameUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -35,16 +38,45 @@ public class UploadController {
             if (result != null && result.containsKey("success") && (Boolean) result.get("success")) {
                 // 检测成功
                 String annotatedImage = (String) result.get("annotatedImage");
-                Boolean hasDanger = (Boolean) result.getOrDefault("hasDanger", false);
                 Integer count = (Integer) result.getOrDefault("count", 0);
+                
+                // 获取检测结果列表
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> detections = (List<Map<String, Object>>) result.getOrDefault("detections", new ArrayList<>());
+                
+                // 处理检测结果，添加中文名称和描述
+                List<Map<String, Object>> processedDetections = new ArrayList<>();
+                List<Map<String, Object>> dangerDetections = new ArrayList<>();
+                
+                for (Map<String, Object> detection : detections) {
+                    String className = (String) detection.get("className");
+                    String chineseName = DetectionNameUtil.getChineseName(className);
+                    String description = DetectionNameUtil.getDescription(className);
+                    boolean isDangerous = DetectionNameUtil.isDangerous(className);
+                    int dangerLevel = DetectionNameUtil.getDangerLevel(className);
+                    
+                    detection.put("chineseName", chineseName);
+                    detection.put("description", description);
+                    detection.put("isDangerous", isDangerous);
+                    detection.put("dangerLevel", dangerLevel);
+                    
+                    processedDetections.add(detection);
+                    if (isDangerous) {
+                        dangerDetections.add(detection);
+                    }
+                }
                 
                 // 设置检测结果图片
                 model.addAttribute("detectionImage", annotatedImage);
+                model.addAttribute("detections", processedDetections);
+                model.addAttribute("dangerDetections", dangerDetections);
+                model.addAttribute("totalCount", count);
+                model.addAttribute("dangerCount", dangerDetections.size());
                 
-                // 设置安全状态
-                if (hasDanger != null && hasDanger) {
+                // 设置安全状态（基于实际危险行为数量判断）
+                if (dangerDetections.size() > 0) {
                     model.addAttribute("safetyStatus", "danger");
-                    model.addAttribute("msg", "⚠️ 检测到 " + count + " 个危险驾驶行为，请查看标注结果");
+                    model.addAttribute("msg", "⚠️ 检测到 " + dangerDetections.size() + " 个危险驾驶行为，请查看详细标注结果");
                 } else {
                     model.addAttribute("safetyStatus", "safe");
                     model.addAttribute("msg", "✅ 检测完成，未发现危险驾驶行为");

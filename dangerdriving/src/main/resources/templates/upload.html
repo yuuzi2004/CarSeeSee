@@ -344,6 +344,101 @@
             text-align:center;
             line-height:1.6;
         }
+        
+        /* 详细检测结果列表 */
+        .detection-list{
+            margin-top:25px;
+            display:flex;
+            flex-direction:column;
+            gap:15px;
+        }
+        .detection-item{
+            background:rgba(255,255,255,0.8);
+            border-radius:12px;
+            padding:18px 20px;
+            border-left:4px solid var(--铜绿);
+            box-shadow:0 2px 8px rgba(84,150,136,.1);
+            transition:all 0.3s ease;
+        }
+        .detection-item:hover{
+            transform:translateX(5px);
+            box-shadow:0 4px 12px rgba(84,150,136,.15);
+        }
+        .detection-item.danger{
+            border-left-color:#dc3545;
+            background:rgba(220,53,69,0.05);
+        }
+        .detection-item.danger-level-3{
+            border-left-color:#dc3545;
+            background:rgba(220,53,69,0.1);
+            border-left-width:6px;
+        }
+        .detection-item.danger-level-2{
+            border-left-color:#ff9800;
+            background:rgba(255,152,0,0.08);
+        }
+        .detection-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:10px;
+        }
+        .detection-name{
+            font-size:18px;
+            font-weight:600;
+            color:var(--铜绿深);
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+        .detection-item.danger .detection-name{
+            color:#dc3545;
+        }
+        .detection-confidence{
+            font-size:14px;
+            color:var(--副文字);
+            background:rgba(84,150,136,0.1);
+            padding:4px 12px;
+            border-radius:12px;
+        }
+        .detection-item.danger .detection-confidence{
+            background:rgba(220,53,69,0.15);
+            color:#c03545;
+        }
+        .detection-description{
+            font-size:14px;
+            color:var(--副文字);
+            line-height:1.6;
+            margin-top:8px;
+            padding:10px;
+            background:rgba(244,234,197,0.3);
+            border-radius:8px;
+        }
+        .detection-item.danger .detection-description{
+            background:rgba(220,53,69,0.08);
+            color:#5a7a6d;
+        }
+        .detection-info{
+            display:flex;
+            gap:15px;
+            margin-top:10px;
+            font-size:13px;
+            color:var(--副文字);
+        }
+        .detection-info-item{
+            display:flex;
+            align-items:center;
+            gap:5px;
+        }
+        .detection-info-label{
+            font-weight:500;
+        }
+        .no-detections{
+            text-align:center;
+            padding:30px;
+            color:var(--副文字);
+            font-size:15px;
+        }
 
         /* 已选择文件提示 */
         .file-selected {
@@ -355,6 +450,61 @@
             background: rgba(84,150,136,0.08);
             border-radius: 12px;
             display: none;
+        }
+        
+        /* 可检测行为列表 */
+        .detectable-behaviors{
+            margin-top:30px;
+            padding-top:30px;
+            border-top:2px solid rgba(84,150,136,0.2);
+        }
+        .behaviors-title{
+            font-size:18px;
+            font-weight:600;
+            color:var(--铜绿深);
+            margin-bottom:20px;
+            text-align:center;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+        }
+        .behaviors-title::before{
+            content:'🔍';
+            font-size:20px;
+        }
+        .behaviors-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+            gap:12px;
+            margin-top:15px;
+        }
+        .behavior-item{
+            background:rgba(255,255,255,0.8);
+            padding:12px 16px;
+            border-radius:10px;
+            border-left:3px solid var(--铜绿);
+            font-size:14px;
+            color:var(--铜绿深);
+            transition:all 0.3s ease;
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+        .behavior-item:hover{
+            transform:translateX(5px);
+            box-shadow:0 4px 12px rgba(84,150,136,.15);
+            background:rgba(255,255,255,0.95);
+        }
+        .behavior-item.danger{
+            border-left-color:#dc3545;
+            background:rgba(220,53,69,0.08);
+        }
+        .behavior-item.safe{
+            border-left-color:var(--铜绿);
+        }
+        .behavior-icon{
+            font-size:16px;
         }
 
         /* 加载动画 */
@@ -406,6 +556,12 @@
             .result-img-box{
                 min-height:300px;
             }
+            .behaviors-grid{
+                grid-template-columns:1fr;
+            }
+            .behaviors-title{
+                font-size:16px;
+            }
         }
     </style>
 </head>
@@ -444,11 +600,11 @@
             <div class="result-title">检测结果</div>
             <div class="result-img-box" id="resultImgBox">
                 <!-- 预览图 -->
-                <img id="previewImg" src="" alt="预览图片" style="display:none; max-width:100%; max-height:600px;"/>
+                <img id="previewImg" src="" alt="预览图片" style="display:none; max-width:100%; max-height:600px; object-fit:contain;"/>
                 <!-- 检测结果图 -->
-                <img th:src="${detectionImage}" id="detectionImg" alt="检测结果" th:if="${detectionImage}" style="display:none;"/>
+                <img th:if="${detectionImage}" th:src="${detectionImage}" id="detectionImg" alt="检测结果" style="max-width:100%; max-height:600px; object-fit:contain;"/>
                 <!-- 空状态提示 -->
-                <div id="emptyState" class="empty-txt">检测结果图片将在此处显示<br/>危险区域会被自动框选标注</div>
+                <div id="emptyState" class="empty-txt" th:unless="${detectionImage}">检测结果图片将在此处显示<br/>危险区域会被自动框选标注</div>
             </div>
 
             <!-- 状态标签 -->
@@ -462,6 +618,45 @@
             <!-- 消息提示 -->
             <div class="msg" th:if="${msg}" id="msgBox">[[${msg}]]</div>
             <div th:unless="${msg}" id="emptyMsg" class="empty-txt">请上传文件并点击检测按钮开始分析</div>
+            
+            <!-- 详细检测结果列表 -->
+            <div th:if="${detections != null and !detections.isEmpty()}" class="detection-list">
+                <div style="font-size:18px;font-weight:600;color:var(--铜绿深);margin-bottom:15px;padding-bottom:10px;border-bottom:2px solid rgba(84,150,136,0.2);">
+                    📋 详细检测结果
+                    <span th:if="${dangerCount != null and dangerCount > 0}" style="color:#dc3545;font-size:16px;margin-left:10px;">
+                        (发现 <span th:text="${dangerCount}">0</span> 个危险行为)
+                    </span>
+                </div>
+                <div th:each="detection : ${detections}" 
+                     th:classappend="${detection.isDangerous} ? 'danger danger-level-' + ${detection.dangerLevel} : ''"
+                     class="detection-item">
+                    <div class="detection-header">
+                        <div class="detection-name">
+                            <span th:if="${detection.isDangerous}">⚠️</span>
+                            <span th:unless="${detection.isDangerous}">✅</span>
+                            <span th:text="${detection.chineseName}">行为名称</span>
+                        </div>
+                        <div class="detection-confidence">
+                            置信度: <span th:text="${#numbers.formatDecimal(detection.confidence, 1, 2)}">0.00</span>
+                        </div>
+                    </div>
+                    <div class="detection-description" th:text="${detection.description}">
+                        行为描述
+                    </div>
+                    <div class="detection-info" th:if="${detection.bbox != null}">
+                        <div class="detection-info-item">
+                            <span class="detection-info-label">位置:</span>
+                            <span>X: <span th:text="${#numbers.formatDecimal(detection.bbox.x1, 1, 0)}">0</span> - <span th:text="${#numbers.formatDecimal(detection.bbox.x2, 1, 0)}">0</span></span>
+                        </div>
+                        <div class="detection-info-item">
+                            <span>Y: <span th:text="${#numbers.formatDecimal(detection.bbox.y1, 1, 0)}">0</span> - <span th:text="${#numbers.formatDecimal(detection.bbox.y2, 1, 0)}">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${detections == null or detections.isEmpty()}" class="no-detections">
+                暂无检测结果
+            </div>
         </div>
     </div>
 </main>
@@ -499,11 +694,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         initState();
 
-        // 检查是否有检测结果图
-        if (detectionImg && detectionImg.src) {
+        // 检查是否有检测结果图（Thymeleaf已经渲染了，只需要显示）
+        if (detectionImg && detectionImg.src && detectionImg.src.trim() !== '' && detectionImg.src !== window.location.href) {
             previewImg.style.display = 'none';
             detectionImg.style.display = 'block';
-            emptyState.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'none';
 
             // 显示对应的状态标签
             if (safeTag && safeTag.textContent) safeTag.style.display = 'inline-block';
@@ -513,8 +708,11 @@
             // 显示消息
             if (msgBox && msgBox.textContent) {
                 msgBox.style.display = 'block';
-                emptyMsg.style.display = 'none';
+                if (emptyMsg) emptyMsg.style.display = 'none';
             }
+        } else {
+            // 没有检测结果，确保检测结果图隐藏
+            if (detectionImg) detectionImg.style.display = 'none';
         }
     });
 

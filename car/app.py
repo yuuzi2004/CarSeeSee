@@ -18,27 +18,63 @@ CORS(app)  # 允许跨域请求，方便SpringBoot调用
 # 全局变量：加载模型（启动时加载一次，避免重复加载）
 model = None
 class_names = [
-    'normal_driving',
-    'talking_on_phone',
-    'sleeping',
-    'chatting',
-    'no_seatbelt',
-    'eating',
-    'smoking',
-    'sudden_acceleration',
-    'sudden_brake',
-    'sharp_turn'
+    'normal_driving',        # 0: 正常驾驶
+    'right_hand_messaging',  # 1: 右手发消息
+    'right_hand_calling',    # 2: 右手打电话
+    'left_hand_messaging',   # 3: 左手发消息
+    'left_hand_calling',     # 4: 左手打电话
+    'adjusting_radio',       # 5: 调整收音机
+    'drinking_water',        # 6: 喝水
+    'holding_objects',       # 7: 手持物品
+    'adjusting_clothing',    # 8: 整理衣物
+    'talking_to_passenger'  # 9: 与乘客交谈
 ]
 
 def load_model():
     """加载YOLOv8模型"""
     global model
-    model_path = "yolov8n.pt"
+    # 优先使用训练好的模型
+    model_path = "CarSeeSee\car/best.pt"
     if not os.path.exists(model_path):
-        raise FileNotFoundError(f"模型文件不存在: {model_path}")
+        model_path = "best.pt"
+        if not os.path.exists(model_path):
+            model_path = "yolov8n.pt"
+            print(f"⚠️  last.pt和best.pt不存在，使用默认模型: {model_path}")
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"模型文件不存在: {model_path}，请先训练模型或下载预训练模型")
     model = YOLO(model_path)
-    print(f"✅ 模型加载成功: {model_path}")
+    print(f"✅ 模型加载成功: {os.path.abspath(model_path)}")
+    # 打印模型类别信息
+    if hasattr(model, 'names'):
+        print(f"📋 模型类别数量: {len(model.names)}")
+        print(f"📋 模型类别: {list(model.names.values())[:10]}...")  # 只显示前10个
     return model
+
+def calculate_iou(box1, box2):
+    """计算两个边界框的IoU（交并比）"""
+    x1_1, y1_1, x2_1, y2_1 = box1
+    x1_2, y1_2, x2_2, y2_2 = box2
+    
+    # 计算交集
+    x1_i = max(x1_1, x1_2)
+    y1_i = max(y1_1, y1_2)
+    x2_i = min(x2_1, x2_2)
+    y2_i = min(y2_1, y2_2)
+    
+    if x2_i <= x1_i or y2_i <= y1_i:
+        return 0.0
+    
+    inter_area = (x2_i - x1_i) * (y2_i - y1_i)
+    
+    # 计算并集
+    box1_area = (x2_1 - x1_1) * (y2_1 - y1_1)
+    box2_area = (x2_2 - x1_2) * (y2_2 - y1_2)
+    union_area = box1_area + box2_area - inter_area
+    
+    if union_area == 0:
+        return 0.0
+    
+    return inter_area / union_area
 
 def base64_to_image(base64_string):
     """将base64字符串转换为OpenCV图像"""
@@ -139,32 +175,61 @@ def predict():
                 "error": "无法获取图片"
             }), 400
         
-        # 执行推理
-        results = model(image)
+        # 执行推理（使用更严格的NMS去重）
+        results = model(image, conf=0.25, iou=0.5)  # conf: 置信度阈值, iou: NMS的IoU阈值（提高以减少重复）
+        
+        # 获取模型的实际类别名称（如果模型有自定义类别）
+        model_class_names = model.names if hasattr(model, 'names') else class_names
         
         # 解析结果
-        detections = []
+        raw_detections = []
         for r in results:
             for box in r.boxes:
-                # 获取类别ID和置信度
                 cls_id = int(box.cls[0])
                 confidence = float(box.conf[0])
-                
-                # 获取边界框坐标（xyxy格式）
                 x1, y1, x2, y2 = box.xyxy[0].tolist()
                 
-                # 获取类别名称
-                class_name = class_names[cls_id] if cls_id < len(class_names) else f"class_{cls_id}"
+                if cls_id in model_class_names:
+                    class_name = model_class_names[cls_id]
+                elif cls_id < len(class_names):
+                    class_name = class_names[cls_id]
+                else:
+                    class_name = f"class_{cls_id}"
                 
-                detections.append({
+                raw_detections.append({
                     "class_id": cls_id,
                     "class_name": class_name,
-                    "confidence": round(confidence, 4),
+                    "confidence": confidence,
+                    "bbox": [x1, y1, x2, y2]
+                })
+        
+        # 使用IoU进行去重：对于相同类别且IoU>0.5的检测，只保留置信度最高的
+        detections = []
+        for i, det1 in enumerate(raw_detections):
+            is_duplicate = False
+            for j, det2 in enumerate(raw_detections):
+                if i == j:
+                    continue
+                # 相同类别且IoU大于0.5，认为是重复检测
+                if det1["class_name"] == det2["class_name"]:
+                    iou = calculate_iou(det1["bbox"], det2["bbox"])
+                    if iou > 0.5:
+                        # 如果当前检测的置信度更低，跳过
+                        if det1["confidence"] < det2["confidence"]:
+                            is_duplicate = True
+                            break
+                        # 如果当前检测的置信度更高，移除另一个（稍后处理）
+            
+            if not is_duplicate:
+                detections.append({
+                    "class_id": det1["class_id"],
+                    "class_name": det1["class_name"],
+                    "confidence": round(det1["confidence"], 4),
                     "bbox": {
-                        "x1": round(x1, 2),
-                        "y1": round(y1, 2),
-                        "x2": round(x2, 2),
-                        "y2": round(y2, 2)
+                        "x1": round(det1["bbox"][0], 2),
+                        "y1": round(det1["bbox"][1], 2),
+                        "x2": round(det1["bbox"][2], 2),
+                        "y2": round(det1["bbox"][3], 2)
                     }
                 })
         
@@ -221,36 +286,69 @@ def predict_with_image():
                 "error": "无法获取图片"
             }), 400
         
-        # 执行推理
-        results = model(image)
+        # 执行推理（使用更严格的NMS去重）
+        results = model(image, conf=0.25, iou=0.5)  # conf: 置信度阈值, iou: NMS的IoU阈值（提高以减少重复）
         
-        # 获取带标注的图片
-        annotated_image = results[0].plot()
+        # 获取模型的实际类别名称（如果模型有自定义类别）
+        model_class_names = model.names if hasattr(model, 'names') else class_names
         
-        # 转换为base64
-        _, buffer = cv2.imencode('.jpg', annotated_image)
-        image_base64 = base64.b64encode(buffer).decode('utf-8')
-        
-        # 解析检测结果
-        detections = []
+        # 解析结果
+        raw_detections = []
         for r in results:
             for box in r.boxes:
                 cls_id = int(box.cls[0])
                 confidence = float(box.conf[0])
                 x1, y1, x2, y2 = box.xyxy[0].tolist()
-                class_name = class_names[cls_id] if cls_id < len(class_names) else f"class_{cls_id}"
                 
-                detections.append({
+                if cls_id in model_class_names:
+                    class_name = model_class_names[cls_id]
+                elif cls_id < len(class_names):
+                    class_name = class_names[cls_id]
+                else:
+                    class_name = f"class_{cls_id}"
+                
+                raw_detections.append({
                     "class_id": cls_id,
                     "class_name": class_name,
-                    "confidence": round(confidence, 4),
+                    "confidence": confidence,
+                    "bbox": [x1, y1, x2, y2]
+                })
+        
+        # 使用IoU进行去重：对于相同类别且IoU>0.5的检测，只保留置信度最高的
+        detections = []
+        for i, det1 in enumerate(raw_detections):
+            is_duplicate = False
+            for j, det2 in enumerate(raw_detections):
+                if i == j:
+                    continue
+                # 相同类别且IoU大于0.5，认为是重复检测
+                if det1["class_name"] == det2["class_name"]:
+                    iou = calculate_iou(det1["bbox"], det2["bbox"])
+                    if iou > 0.5:
+                        # 如果当前检测的置信度更低，跳过
+                        if det1["confidence"] < det2["confidence"]:
+                            is_duplicate = True
+                            break
+            
+            if not is_duplicate:
+                detections.append({
+                    "class_id": det1["class_id"],
+                    "class_name": det1["class_name"],
+                    "confidence": round(det1["confidence"], 4),
                     "bbox": {
-                        "x1": round(x1, 2),
-                        "y1": round(y1, 2),
-                        "x2": round(x2, 2),
-                        "y2": round(y2, 2)
+                        "x1": round(det1["bbox"][0], 2),
+                        "y1": round(det1["bbox"][1], 2),
+                        "x2": round(det1["bbox"][2], 2),
+                        "y2": round(det1["bbox"][3], 2)
                     }
                 })
+        
+        # 获取带标注的图片（使用模型自己的类别名称进行标注）
+        annotated_image = results[0].plot()
+        
+        # 转换为base64
+        _, buffer = cv2.imencode('.jpg', annotated_image)
+        image_base64 = base64.b64encode(buffer).decode('utf-8')
         
         return jsonify({
             "success": True,
