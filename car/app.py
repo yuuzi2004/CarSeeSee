@@ -33,7 +33,7 @@ class_names = [
 def load_model():
     """加载YOLOv8模型"""
     global model
-    model_path = "car\yolov8n.pt"
+    model_path = "yolov8n.pt"
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"模型文件不存在: {model_path}")
     model = YOLO(model_path)
