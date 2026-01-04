@@ -24,11 +24,11 @@
             width:100%;
             font-family:"Segoe UI","Microsoft YaHei",sans-serif;
             background:var(--蒸栗);
-            background-image:radial-gradient(ellipse 120% 100% at 50% 0%,
-            var(--铜绿) 0%,
-            rgba(132,180,170,0.6) 40%,
-            rgba(244,234,197,0.8) 70%,
-            var(--蒸栗) 100%);
+            background-image:radial-gradient(ellipse 120% 100% at 50% 0%, 
+                var(--铜绿) 0%, 
+                rgba(132,180,170,0.6) 40%,
+                rgba(244,234,197,0.8) 70%,
+                var(--蒸栗) 100%);
             background-attachment:fixed;
             background-size:100% 100%;
             background-repeat:no-repeat;
@@ -37,7 +37,7 @@
             position:relative;
             overflow-x:hidden;
         }
-
+        
         /* 背景装饰动画 */
         body::before{
             content:'';
@@ -56,7 +56,7 @@
             0%{transform:translate(0,0) rotate(0deg);}
             100%{transform:translate(-50px,-50px) rotate(360deg);}
         }
-
+        
         /* 导航栏 - 轻快半透明风格 */
         .navbar{
             width:100%;
@@ -110,7 +110,7 @@
             background:linear-gradient(90deg, transparent, var(--铜绿浅), transparent);
             border-radius:2px;
         }
-
+        
         /* 主内容区 */
         .main-container{
             flex:1;
@@ -129,7 +129,7 @@
             padding:45px;
             margin-bottom:30px;
             box-shadow:0 8px 32px rgba(84,150,136,.12),
-            0 2px 8px rgba(84,150,136,.08);
+                       0 2px 8px rgba(84,150,136,.08);
             border:1px solid rgba(255,255,255,0.5);
             transition:all 0.3s ease;
             position:relative;
@@ -142,16 +142,16 @@
             left:0;
             right:0;
             height:3px;
-            background:linear-gradient(90deg,
-            var(--铜绿浅),
-            var(--铜绿),
-            var(--铜绿浅));
+            background:linear-gradient(90deg, 
+                var(--铜绿浅), 
+                var(--铜绿), 
+                var(--铜绿浅));
             opacity:0.6;
         }
         .content-section:hover{
             transform:translateY(-2px);
             box-shadow:0 12px 40px rgba(84,150,136,.15),
-            0 4px 12px rgba(84,150,136,.1);
+                       0 4px 12px rgba(84,150,136,.1);
         }
         .header{
             text-align:center;
@@ -263,14 +263,48 @@
             margin-bottom:10px;
             text-align:center;
         }
+        /* 图像对比容器 */
+        .image-comparison-container{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:25px;
+            margin-top:25px;
+            align-items:start;
+        }
+        @media (max-width: 768px) {
+            .image-comparison-container{
+                grid-template-columns:1fr;
+                gap:20px;
+            }
+        }
+        .image-panel{
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+            width:100%;
+        }
+        .image-panel .result-img-box{
+            min-height:400px;
+            max-height:600px;
+        }
+        .image-panel-title{
+            font-size:17px;
+            font-weight:600;
+            color:var(--铜绿深);
+            text-align:center;
+            padding:12px 16px;
+            background:linear-gradient(135deg, rgba(84,150,136,0.12) 0%, rgba(84,150,136,0.08) 100%);
+            border-radius:10px;
+            border:2px solid rgba(84,150,136,0.2);
+            box-shadow:0 2px 8px rgba(84,150,136,.08);
+        }
         .result-img-box{
             width:100%;
-            min-height:400px;
+            min-height:350px;
             border-radius:16px;
-            border:2px dashed rgba(84,150,136,0.25);
-            background:linear-gradient(135deg,
-            rgba(244,234,197,0.15) 0%,
-            rgba(255,255,255,0.3) 50%,
+            border:3px solid rgba(84,150,136,0.3);
+            background:linear-gradient(135deg, 
+            rgba(255,255,255,0.98) 0%, 
             rgba(244,234,197,0.15) 100%);
             display:flex;
             align-items:center;
@@ -278,19 +312,29 @@
             overflow:hidden;
             transition:all 0.3s ease;
             position:relative;
+            box-shadow:0 8px 24px rgba(84,150,136,.12),
+                       0 2px 8px rgba(84,150,136,.08);
+            padding:20px;
         }
         .result-img-box:hover{
-            border-color:rgba(84,150,136,0.4);
-            background:linear-gradient(135deg,
-            rgba(244,234,197,0.2) 0%,
-            rgba(255,255,255,0.4) 50%,
-            rgba(244,234,197,0.2) 100%);
+            border-color:rgba(84,150,136,0.5);
+            box-shadow:0 12px 32px rgba(84,150,136,.18),
+                       0 4px 12px rgba(84,150,136,.12);
+            transform:translateY(-2px);
         }
         .result-img-box img{
-            max-width:100%;
-            max-height:600px;
+            max-width:calc(100% - 40px);
+            max-height:calc(100vh - 400px);
+            width:auto;
+            height:auto;
             object-fit:contain;
-            border-radius:8px;
+            border-radius:12px;
+            box-shadow:0 4px 16px rgba(0,0,0,.08);
+            transition:all 0.3s ease;
+            display:block;
+        }
+        .result-img-box img:hover{
+            box-shadow:0 6px 20px rgba(0,0,0,.12);
         }
         .status-tag{
             padding:12px 32px;border-radius:25px;font-size:16px;font-weight:600;
@@ -342,7 +386,8 @@
             color:var(--副文字);
             font-size:15px;
             text-align:center;
-            line-height:1.6;
+            line-height:1.8;
+            padding:40px 20px;
         }
         
         /* 详细检测结果列表 */
@@ -439,7 +484,106 @@
             color:var(--副文字);
             font-size:15px;
         }
-
+        
+        /* 检测参数调整区域 */
+        .param-section{
+            margin-top:30px;
+            padding-top:30px;
+            border-top:2px solid rgba(84,150,136,0.2);
+        }
+        .param-title{
+            font-size:18px;
+            font-weight:600;
+            color:var(--铜绿深);
+            margin-bottom:20px;
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+        .param-title::before{
+            content:'⚙️';
+            font-size:20px;
+        }
+        .param-item{
+            margin-bottom:25px;
+        }
+        .param-label{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:10px;
+        }
+        .param-label-text{
+            font-size:16px;
+            font-weight:500;
+            color:var(--铜绿深);
+        }
+        .param-value{
+            font-size:16px;
+            font-weight:600;
+            color:var(--铜绿);
+            background:rgba(84,150,136,0.1);
+            padding:4px 12px;
+            border-radius:8px;
+            min-width:50px;
+            text-align:center;
+        }
+        .param-slider{
+            width:100%;
+            height:8px;
+            border-radius:4px;
+            background:rgba(84,150,136,0.2);
+            outline:none;
+            -webkit-appearance:none;
+            margin:15px 0;
+        }
+        .param-slider::-webkit-slider-thumb{
+            -webkit-appearance:none;
+            appearance:none;
+            width:20px;
+            height:20px;
+            border-radius:50%;
+            background:var(--铜绿);
+            cursor:pointer;
+            box-shadow:0 2px 6px rgba(84,150,136,.3);
+            transition:all 0.3s ease;
+        }
+        .param-slider::-webkit-slider-thumb:hover{
+            background:var(--铜绿深);
+            transform:scale(1.1);
+        }
+        .param-slider::-moz-range-thumb{
+            width:20px;
+            height:20px;
+            border-radius:50%;
+            background:var(--铜绿);
+            cursor:pointer;
+            border:none;
+            box-shadow:0 2px 6px rgba(84,150,136,.3);
+        }
+        .param-input{
+            width:80px;
+            padding:8px 12px;
+            border:2px solid var(--铜绿浅);
+            border-radius:8px;
+            font-size:14px;
+            text-align:center;
+            color:var(--铜绿深);
+            background:rgba(255,255,255,0.9);
+            transition:all 0.3s ease;
+        }
+        .param-input:focus{
+            outline:none;
+            border-color:var(--铜绿);
+            box-shadow:0 0 0 3px rgba(84,150,136,.1);
+        }
+        .param-desc{
+            font-size:13px;
+            color:var(--副文字);
+            margin-top:8px;
+            line-height:1.5;
+        }
+        
         /* 已选择文件提示 */
         .file-selected {
             margin-top: 20px;
@@ -522,7 +666,7 @@
             animation: spin 1s ease-in-out infinite;
             margin-right: 8px;
         }
-
+        
         /* 响应式设计 */
         @media (max-width: 768px) {
             .main-container{
@@ -534,12 +678,12 @@
             .nav-container{
                 padding:0 20px;
             }
-            .nav-title{
-                font-size:18px;
-            }
-            .nav-title::before{
-                font-size:20px;
-            }
+        .nav-title{
+            font-size:18px;
+        }
+        .nav-title::before{
+            font-size:20px;
+        }
             .header h1{
                 font-size:24px;
             }
@@ -555,6 +699,14 @@
             }
             .result-img-box{
                 min-height:300px;
+                padding:15px;
+            }
+            .result-img-box img{
+                max-height:calc(100vh - 350px);
+            }
+            .image-panel .result-img-box{
+                min-height:300px;
+                max-height:500px;
             }
             .behaviors-grid{
                 grid-template-columns:1fr;
@@ -566,61 +718,128 @@
     </style>
 </head>
 <body>
-<!-- 导航栏 -->
-<nav class="navbar">
-    <div class="nav-container">
-        <div class="nav-title">车辆危险驾驶检测系统</div>
-    </div>
-</nav>
-
-<!-- 主内容区 -->
-<main class="main-container">
-    <div class="content-section">
-        <div class="header">
-            <h1>车辆危险驾驶检测</h1>
-            <p>上传图片 / 视频，自动识别危险驾驶行为并框选危险区域</p>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-title">车辆危险驾驶检测系统</div>
         </div>
+    </nav>
 
-        <form id="detectForm" method="post" enctype="multipart/form-data" action="/detect">
-            <div class="btn-row">
-                <!-- 隐藏原生 input，用 label 当按钮 -->
-                <input type="file" id="fileInput" name="file" accept="image/*,video/*" required style="display:none;"/>
-                <label for="fileInput" class="btn btn-secondary">选择文件</label>
-                <button type="submit" class="btn btn-primary">开始检测</button>
+    <!-- 主内容区 -->
+    <main class="main-container">
+        <div class="content-section">
+            <div class="header">
+                <h1>车辆危险驾驶检测</h1>
+                <p>上传图片 / 视频，自动识别危险驾驶行为并框选危险区域</p>
             </div>
+
+        <form id="detectForm" method="post" enctype="multipart/form-data">
+                <div class="btn-row">
+                    <!-- 隐藏原生 input，用 label 当按钮 -->
+                    <input type="file" id="fileInput" name="file" accept="image/*,video/*" required style="display:none;"/>
+                    <label for="fileInput" class="btn btn-secondary">选择文件</label>
+                    <button type="submit" class="btn btn-primary">开始检测</button>
+                </div>
             <!-- 已选择文件提示 -->
             <div id="fileSelected" class="file-selected">
                 <span>已选择：</span><span id="fileName"></span>
             </div>
-        </form>
-    </div>
+            
+            <!-- 检测参数调整 -->
+            <div class="param-section">
+                <div class="param-title">检测参数调整</div>
+                
+                <!-- 置信度阈值 -->
+                <div class="param-item">
+                    <div class="param-label">
+                        <span class="param-label-text">置信度阈值</span>
+                        <span class="param-value" id="confValue">0.25</span>
+                    </div>
+                    <input type="range" id="confSlider" class="param-slider" min="0.1" max="0.99" step="0.01" value="0.25"/>
+                    <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
+                        <input type="number" id="confInput" class="param-input" min="0.1" max="0.99" step="0.01" value="0.25"/>
+                        <span class="param-desc">值越高，检测越严格，只显示高置信度的结果</span>
+                    </div>
+                </div>
+                
+                <!-- IoU阈值 -->
+                <div class="param-item">
+                    <div class="param-label">
+                        <span class="param-label-text">IoU阈值</span>
+                        <span class="param-value" id="iouValue">0.5</span>
+                    </div>
+                    <input type="range" id="iouSlider" class="param-slider" min="0.1" max="0.99" step="0.01" value="0.5"/>
+                    <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
+                        <input type="number" id="iouInput" class="param-input" min="0.1" max="0.99" step="0.01" value="0.5"/>
+                        <span class="param-desc">值越高，重叠框过滤越严格，减少重复检测</span>
+                    </div>
+                </div>
+                
+                <!-- 隐藏的参数输入（用于表单提交） -->
+                <input type="hidden" id="confHidden" name="conf" value="0.25"/>
+                <input type="hidden" id="iouHidden" name="iou" value="0.5"/>
+            </div>
+            </form>
+        </div>
 
-    <div class="content-section">
+        <div class="content-section">
         <div class="result-area">
             <div class="result-title">检测结果</div>
-            <div class="result-img-box" id="resultImgBox">
-                <!-- 预览图 -->
-                <img id="previewImg" src="" alt="预览图片" style="display:none; max-width:100%; max-height:600px; object-fit:contain;"/>
-                <!-- 检测结果图 -->
-                <img th:if="${detectionImage}" th:src="${detectionImage}" id="detectionImg" alt="检测结果" style="max-width:100%; max-height:600px; object-fit:contain;"/>
-                <!-- 空状态提示 -->
-                <div id="emptyState" class="empty-txt" th:unless="${detectionImage}">检测结果图片将在此处显示<br/>危险区域会被自动框选标注</div>
+            
+            <!-- 图像对比显示（检测后） -->
+            <div class="image-comparison-container" id="imageComparison" style="display:none;">
+                <!-- 原始图像 -->
+                <div class="image-panel">
+                    <div class="image-panel-title">📷 原始图像</div>
+                    <div class="result-img-box">
+                        <img id="originalImg" src="" alt="原始图像"/>
+                    </div>
+                </div>
+                <!-- 检测结果图像 -->
+                <div class="image-panel">
+                    <div class="image-panel-title">🎯 检测结果</div>
+                    <div class="result-img-box">
+                        <img id="detectionImg" src="" alt="检测结果" style="display:none;"/>
+                    </div>
+                </div>
             </div>
+            
+            <!-- 单图显示（未检测时） -->
+            <div class="result-img-box" id="singleImgBox" style="min-height:400px;">
+                <!-- 预览图 -->
+                <img id="previewImg" src="" alt="预览图片" style="display:none;"/>
+                <!-- 检测结果图（单图模式） -->
+                <img id="detectionImgSingle" src="" alt="检测结果" style="display:none;"/>
+                <!-- 空状态提示 -->
+                <div id="emptyState" class="empty-txt">
+                    <div style="font-size:48px;margin-bottom:15px;opacity:0.6;">📸</div>
+                    检测结果图片将在此处显示<br/>
+                    <span style="font-size:13px;color:var(--副文字);opacity:0.8;">危险区域会被自动框选标注</span>
+                </div>
+            </div>
+            
 
             <!-- 状态标签 -->
             <div id="loadingTag" class="loading-tag" style="display:none;">
                 <span class="loading-icon"></span>正在检测中，请稍候...
             </div>
-            <div th:if="${safetyStatus == 'safe'}" id="safeTag" class="status-tag safe">✅ 检测安全 - 未发现危险驾驶行为</div>
-            <div th:if="${safetyStatus == 'danger'}" id="dangerTag" class="status-tag danger">⚠️ 检测危险 - 发现危险驾驶行为</div>
-            <div th:unless="${safetyStatus}" id="statusPlaceholder" style="height:50px;"></div>
+            <div id="safeTag" class="status-tag safe" style="display:none;">✅ 检测安全 - 未发现危险驾驶行为</div>
+            <div id="dangerTag" class="status-tag danger" style="display:none;">⚠️ 检测危险 - 发现危险驾驶行为</div>
+            <div id="statusPlaceholder" style="height:50px;"></div>
 
             <!-- 消息提示 -->
-            <div class="msg" th:if="${msg}" id="msgBox">[[${msg}]]</div>
-            <div th:unless="${msg}" id="emptyMsg" class="empty-txt">请上传文件并点击检测按钮开始分析</div>
+            <div class="msg" id="msgBox" style="display:none;"></div>
+            <div id="emptyMsg" class="empty-txt">请上传文件并点击检测按钮开始分析</div>
+            
+            <!-- 当前检测参数显示 -->
+            <div id="paramDisplay" 
+                 style="display:none;margin-top:15px;padding:12px;background:rgba(244,234,197,0.3);border-radius:10px;font-size:13px;color:var(--副文字);text-align:center;">
+                当前检测参数 - 置信度阈值: <strong id="paramConf">0.25</strong> | 
+                IoU阈值: <strong id="paramIou">0.5</strong>
+            </div>
             
             <!-- 详细检测结果列表 -->
-            <div th:if="${detections != null and !detections.isEmpty()}" class="detection-list">
+            <div id="detectionList" class="detection-list" style="display:none;">
                 <div style="font-size:18px;font-weight:600;color:var(--铜绿深);margin-bottom:15px;padding-bottom:10px;border-bottom:2px solid rgba(84,150,136,0.2);">
                     📋 详细检测结果
                     <span th:if="${dangerCount != null and dangerCount > 0}" style="color:#dc3545;font-size:16px;margin-left:10px;">
@@ -654,12 +873,12 @@
                     </div>
                 </div>
             </div>
-            <div th:if="${detections == null or detections.isEmpty()}" class="no-detections">
+            <div id="noDetections" class="no-detections" style="display:none;">
                 暂无检测结果
             </div>
+            </div>
         </div>
-    </div>
-</main>
+    </main>
 <script>
     // 获取DOM元素
     const fileInput = document.getElementById('fileInput');
@@ -667,15 +886,91 @@
     const fileName = document.getElementById('fileName');
     const previewImg = document.getElementById('previewImg');
     const detectionImg = document.getElementById('detectionImg');
+    const detectionImgSingle = document.getElementById('detectionImgSingle');
+    const originalImg = document.getElementById('originalImg');
     const emptyState = document.getElementById('emptyState');
     const resultImgBox = document.getElementById('resultImgBox');
+    const singleImgBox = document.getElementById('singleImgBox');
+    const imageComparison = document.getElementById('imageComparison');
     const detectForm = document.getElementById('detectForm');
+    
+    // 保存已上传的文件（用于重新检测）
+    let savedFile = null;
+    let savedFileName = null;
     const loadingTag = document.getElementById('loadingTag');
     const safeTag = document.getElementById('safeTag');
     const dangerTag = document.getElementById('dangerTag');
     const statusPlaceholder = document.getElementById('statusPlaceholder');
     const msgBox = document.getElementById('msgBox');
     const emptyMsg = document.getElementById('emptyMsg');
+    
+    // 参数调整相关元素
+    const confSlider = document.getElementById('confSlider');
+    const confInput = document.getElementById('confInput');
+    const confValue = document.getElementById('confValue');
+    const confHidden = document.getElementById('confHidden');
+    const iouSlider = document.getElementById('iouSlider');
+    const iouInput = document.getElementById('iouInput');
+    const iouValue = document.getElementById('iouValue');
+    const iouHidden = document.getElementById('iouHidden');
+    
+    // 从后端获取的参数值（如果有）
+    const serverConf = /*[[${confThreshold}]]*/ null;
+    const serverIou = /*[[${iouThreshold}]]*/ null;
+    
+    // 初始化参数值
+    if (serverConf != null && confSlider) {
+        confSlider.value = serverConf;
+        confInput.value = serverConf;
+        confValue.textContent = parseFloat(serverConf).toFixed(2);
+        confHidden.value = serverConf;
+    }
+    if (serverIou != null && iouSlider) {
+        iouSlider.value = serverIou;
+        iouInput.value = serverIou;
+        iouValue.textContent = parseFloat(serverIou).toFixed(2);
+        iouHidden.value = serverIou;
+    }
+    
+    // 置信度滑块和输入框同步
+    if (confSlider && confInput && confValue && confHidden) {
+        confSlider.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            confInput.value = value.toFixed(2);
+            confValue.textContent = value.toFixed(2);
+            confHidden.value = value.toFixed(2);
+        });
+        
+        confInput.addEventListener('input', function() {
+            let value = parseFloat(this.value);
+            if (isNaN(value)) value = 0.25;
+            value = Math.max(0.1, Math.min(0.99, value));
+            this.value = value.toFixed(2);
+            confSlider.value = value;
+            confValue.textContent = value.toFixed(2);
+            confHidden.value = value.toFixed(2);
+        });
+    }
+    
+    // IoU滑块和输入框同步
+    if (iouSlider && iouInput && iouValue && iouHidden) {
+        iouSlider.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            iouInput.value = value.toFixed(2);
+            iouValue.textContent = value.toFixed(2);
+            iouHidden.value = value.toFixed(2);
+        });
+        
+        iouInput.addEventListener('input', function() {
+            let value = parseFloat(this.value);
+            if (isNaN(value)) value = 0.5;
+            value = Math.max(0.1, Math.min(0.99, value));
+            this.value = value.toFixed(2);
+            iouSlider.value = value;
+            iouValue.textContent = value.toFixed(2);
+            iouHidden.value = value.toFixed(2);
+        });
+    }
 
     // 初始化状态
     function initState() {
@@ -695,9 +990,41 @@
         initState();
 
         // 检查是否有检测结果图（Thymeleaf已经渲染了，只需要显示）
-        if (detectionImg && detectionImg.src && detectionImg.src.trim() !== '' && detectionImg.src !== window.location.href) {
-            previewImg.style.display = 'none';
-            detectionImg.style.display = 'block';
+        const hasDetectionResult = (detectionImg && detectionImg.src && detectionImg.src.trim() !== '' && detectionImg.src !== window.location.href) ||
+                                   (detectionImgSingle && detectionImgSingle.src && detectionImgSingle.src.trim() !== '' && detectionImgSingle.src !== window.location.href);
+        
+        if (hasDetectionResult) {
+            // 显示对比视图
+            if (imageComparison) imageComparison.style.display = 'grid';
+            if (singleImgBox) singleImgBox.style.display = 'none';
+            
+            // 确保文件选择状态保持（用于重新检测）
+            if (!fileInput.files[0] && savedFile) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(savedFile);
+                fileInput.files = dataTransfer.files;
+                if (fileName) fileName.textContent = savedFileName;
+                if (fileSelected) fileSelected.style.display = 'block';
+            }
+            
+            // 如果有原始图像，显示它（优先使用previewImg，如果没有则从localStorage获取）
+            if (previewImg && previewImg.src && previewImg.src.trim() !== '' && previewImg.src !== window.location.href) {
+                if (originalImg) {
+                    originalImg.src = previewImg.src;
+                    originalImg.style.display = 'block';
+                }
+            } else {
+                // 尝试从localStorage获取原始图像
+                const savedOriginalImg = localStorage.getItem('originalImageData');
+                if (savedOriginalImg && originalImg) {
+                    originalImg.src = savedOriginalImg;
+                    originalImg.style.display = 'block';
+                }
+            }
+            
+            // 显示检测结果图
+            if (detectionImg) detectionImg.style.display = 'block';
+            if (detectionImgSingle) detectionImgSingle.style.display = 'block';
             if (emptyState) emptyState.style.display = 'none';
 
             // 显示对应的状态标签
@@ -711,8 +1038,11 @@
                 if (emptyMsg) emptyMsg.style.display = 'none';
             }
         } else {
-            // 没有检测结果，确保检测结果图隐藏
+            // 没有检测结果，显示单图视图
+            if (imageComparison) imageComparison.style.display = 'none';
+            if (singleImgBox) singleImgBox.style.display = 'flex';
             if (detectionImg) detectionImg.style.display = 'none';
+            if (detectionImgSingle) detectionImgSingle.style.display = 'none';
         }
     });
 
@@ -720,6 +1050,10 @@
     fileInput.addEventListener('change', function(e) {
         const file = this.files[0];
         if (file) {
+            // 保存文件用于重新检测
+            savedFile = file;
+            savedFileName = file.name;
+            
             // 显示已选择文件提示
             fileSelected.style.display = 'block';
             fileName.textContent = file.name;
@@ -728,10 +1062,20 @@
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    previewImg.src = event.target.result;
+                    const imageData = event.target.result;
+                    previewImg.src = imageData;
                     previewImg.style.display = 'block';
+                    // 保存原始图像用于对比显示
+                    if (originalImg) {
+                        originalImg.src = imageData;
+                    }
+                    // 保存到localStorage以便检测后恢复
+                    localStorage.setItem('originalImageData', imageData);
                     // 隐藏检测结果图和空状态
                     if (detectionImg) detectionImg.style.display = 'none';
+                    if (detectionImgSingle) detectionImgSingle.style.display = 'none';
+                    if (imageComparison) imageComparison.style.display = 'none';
+                    if (singleImgBox) singleImgBox.style.display = 'flex';
                     emptyState.style.display = 'none';
                 };
                 reader.readAsDataURL(file);
@@ -739,6 +1083,9 @@
                 // 非图片文件（视频），只显示文件名
                 previewImg.style.display = 'none';
                 if (detectionImg) detectionImg.style.display = 'none';
+                if (detectionImgSingle) detectionImgSingle.style.display = 'none';
+                if (imageComparison) imageComparison.style.display = 'none';
+                if (singleImgBox) singleImgBox.style.display = 'flex';
                 emptyState.textContent = `已选择视频文件：${file.name}\n点击检测按钮开始分析`;
                 emptyState.style.display = 'block';
             }
@@ -747,34 +1094,286 @@
             initState();
         } else {
             // 未选择文件
+            savedFile = null;
+            savedFileName = null;
             fileSelected.style.display = 'none';
             previewImg.style.display = 'none';
             if (detectionImg) detectionImg.style.display = 'none';
+            if (detectionImgSingle) detectionImgSingle.style.display = 'none';
+            if (imageComparison) imageComparison.style.display = 'none';
+            if (singleImgBox) singleImgBox.style.display = 'flex';
             emptyState.textContent = '检测结果图片将在此处显示\n危险区域会被自动框选标注';
             emptyState.style.display = 'block';
         }
     });
 
-    // 表单提交事件
+    // 更新页面检测结果的函数
+    function updateDetectionResults(data) {
+        if (!data.success) {
+            // 显示错误信息
+            if (msgBox) {
+                msgBox.textContent = '❌ ' + (data.error || '检测失败');
+                msgBox.style.display = 'block';
+            }
+            if (emptyMsg) emptyMsg.style.display = 'none';
+            return;
+        }
+        
+        // 更新检测结果图片
+        const imageData = data.detectionImage || data.annotatedImage;
+        console.log('收到图片数据:', imageData ? '有数据' : '无数据');
+        console.log('数据字段检查 - detectionImage:', data.detectionImage ? '存在' : '不存在');
+        console.log('数据字段检查 - annotatedImage:', data.annotatedImage ? '存在' : '不存在');
+        
+        if (imageData) {
+            // FlaskApiService 已经添加了 data:image/jpeg;base64, 前缀，直接使用
+            let finalImageData = imageData;
+            if (!imageData.startsWith('data:')) {
+                finalImageData = 'data:image/jpeg;base64,' + imageData;
+            }
+            
+            console.log('最终图片数据前缀:', finalImageData.substring(0, 50));
+            console.log('图片元素检查 - detectionImg:', detectionImg ? '存在' : '不存在');
+            console.log('图片元素检查 - detectionImgSingle:', detectionImgSingle ? '存在' : '不存在');
+            console.log('图片元素检查 - imageComparison:', imageComparison ? '存在' : '不存在');
+            
+            if (detectionImg) {
+                detectionImg.src = finalImageData;
+                detectionImg.style.display = 'block';
+                detectionImg.onerror = function(e) {
+                    console.error('检测结果图片加载失败', e);
+                    console.error('图片数据长度:', finalImageData.length);
+                    console.error('图片数据前100字符:', finalImageData.substring(0, 100));
+                };
+                detectionImg.onload = function() {
+                    console.log('检测结果图片加载成功，尺寸:', detectionImg.width, 'x', detectionImg.height);
+                };
+            } else {
+                console.error('detectionImg 元素不存在！');
+            }
+            
+            if (detectionImgSingle) {
+                detectionImgSingle.src = finalImageData;
+                detectionImgSingle.style.display = 'block';
+            } else {
+                console.error('detectionImgSingle 元素不存在！');
+            }
+            
+            // 显示对比视图
+            if (imageComparison) {
+                imageComparison.style.display = 'grid';
+                console.log('显示对比视图');
+            }
+            if (singleImgBox) {
+                singleImgBox.style.display = 'none';
+            }
+            if (emptyState) {
+                emptyState.style.display = 'none';
+            }
+        } else {
+            console.warn('未收到检测结果图片数据');
+            console.warn('完整返回数据:', JSON.stringify(data, null, 2));
+        }
+        
+        // 更新状态标签
+        if (data.safetyStatus === 'safe') {
+            if (safeTag) safeTag.style.display = 'inline-block';
+            if (dangerTag) dangerTag.style.display = 'none';
+        } else if (data.safetyStatus === 'danger') {
+            if (safeTag) safeTag.style.display = 'none';
+            if (dangerTag) dangerTag.style.display = 'inline-block';
+        }
+        if (statusPlaceholder) statusPlaceholder.style.display = 'none';
+        
+        // 更新消息
+        if (msgBox && data.msg) {
+            msgBox.textContent = data.msg;
+            msgBox.style.display = 'block';
+        }
+        if (emptyMsg) emptyMsg.style.display = 'none';
+        
+        // 更新参数显示
+        if (data.confThreshold !== undefined && data.iouThreshold !== undefined) {
+            if (document.getElementById('paramConf')) document.getElementById('paramConf').textContent = parseFloat(data.confThreshold).toFixed(2);
+            if (document.getElementById('paramIou')) document.getElementById('paramIou').textContent = parseFloat(data.iouThreshold).toFixed(2);
+            if (document.getElementById('paramDisplay')) document.getElementById('paramDisplay').style.display = 'block';
+        }
+        
+        // 更新详细检测结果列表
+        const detectionList = document.getElementById('detectionList');
+        const noDetections = document.getElementById('noDetections');
+        if (data.detections && data.detections.length > 0) {
+            if (detectionList) {
+                detectionList.style.display = 'block';
+                // 清空现有内容
+                detectionList.innerHTML = '';
+                
+                // 创建标题
+                const title = document.createElement('div');
+                title.style.cssText = 'font-size:18px;font-weight:600;color:var(--铜绿深);margin-bottom:15px;padding-bottom:10px;border-bottom:2px solid rgba(84,150,136,0.2);';
+                title.innerHTML = '📋 详细检测结果';
+                if (data.dangerCount > 0) {
+                    const dangerSpan = document.createElement('span');
+                    dangerSpan.style.cssText = 'color:#dc3545;font-size:16px;margin-left:10px;';
+                    dangerSpan.textContent = '(发现 ' + data.dangerCount + ' 个危险行为)';
+                    title.appendChild(dangerSpan);
+                }
+                detectionList.appendChild(title);
+                
+                // 创建检测项
+                data.detections.forEach(function(detection) {
+                    const item = document.createElement('div');
+                    item.className = 'detection-item';
+                    if (detection.isDangerous) {
+                        item.classList.add('danger', 'danger-level-' + detection.dangerLevel);
+                    }
+                    
+                    item.innerHTML = `
+                        <div class="detection-header">
+                            <div class="detection-name">
+                                <span>${detection.isDangerous ? '⚠️' : '✅'}</span>
+                                <span>${detection.chineseName || detection.className}</span>
+                            </div>
+                            <div class="detection-confidence">
+                                置信度: <span>${parseFloat(detection.confidence).toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div class="detection-description">${detection.description || ''}</div>
+                        ${detection.bbox ? `
+                        <div class="detection-info">
+                            <div class="detection-info-item">
+                                <span class="detection-info-label">位置:</span>
+                                <span>X: ${Math.round(detection.bbox.x1)} - ${Math.round(detection.bbox.x2)}</span>
+                            </div>
+                            <div class="detection-info-item">
+                                <span>Y: ${Math.round(detection.bbox.y1)} - ${Math.round(detection.bbox.y2)}</span>
+                            </div>
+                        </div>
+                        ` : ''}
+                    `;
+                    detectionList.appendChild(item);
+                });
+            }
+            if (noDetections) noDetections.style.display = 'none';
+        } else {
+            if (detectionList) detectionList.style.display = 'none';
+            if (noDetections) noDetections.style.display = 'block';
+        }
+        
+    }
+    
+    // 表单提交事件（使用AJAX）
     detectForm.addEventListener('submit', function(e) {
-        const file = fileInput.files[0];
+        e.preventDefault(); // 阻止默认表单提交
+        
+        let file = fileInput.files[0];
+        
+        // 如果没有选择新文件，但之前有保存的文件，使用保存的文件
+        if (!file && savedFile) {
+            // 创建新的FileList并设置到input
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(savedFile);
+            fileInput.files = dataTransfer.files;
+            file = savedFile;
+            
+            // 更新文件名显示
+            if (fileName) fileName.textContent = savedFileName;
+            if (fileSelected) fileSelected.style.display = 'block';
+        }
+        
         if (!file) {
-            e.preventDefault();
             alert('请先选择要检测的文件！');
             return;
         }
 
         // 显示加载状态
-        loadingTag.style.display = 'inline-block';
+        if (loadingTag) loadingTag.style.display = 'inline-block';
         if (safeTag) safeTag.style.display = 'none';
         if (dangerTag) dangerTag.style.display = 'none';
         if (statusPlaceholder) statusPlaceholder.style.display = 'none';
 
         // 禁用提交按钮防止重复提交
         const submitBtn = this.querySelector('.btn-primary');
-        submitBtn.disabled = true;
-        submitBtn.style.opacity = '0.7';
-        submitBtn.innerHTML = '<span class="loading-icon"></span>检测中...';
+        const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.7';
+            submitBtn.innerHTML = '<span class="loading-icon"></span>检测中...';
+        }
+        
+        
+        // 获取当前参数值
+        const confValue = confHidden ? parseFloat(confHidden.value) : 0.25;
+        const iouValue = iouHidden ? parseFloat(iouHidden.value) : 0.5;
+        
+        // 创建FormData
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('conf', confValue);
+        formData.append('iou', iouValue);
+        
+        // 发送AJAX请求
+        fetch('/detect-ajax', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP错误: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('检测结果:', data); // 调试用
+            
+            // 隐藏加载状态
+            if (loadingTag) loadingTag.style.display = 'none';
+            
+            // 恢复按钮状态
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.innerHTML = originalBtnText;
+            }
+            // 更新页面内容
+            updateDetectionResults(data);
+        })
+        .catch(error => {
+            console.error('检测失败:', error);
+            // 隐藏加载状态
+            if (loadingTag) loadingTag.style.display = 'none';
+            
+            // 恢复按钮状态
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.innerHTML = originalBtnText;
+            }
+            
+            // 显示错误信息
+            if (msgBox) {
+                msgBox.textContent = '❌ 检测失败：' + (error.message || error);
+                msgBox.style.display = 'block';
+            }
+            if (emptyMsg) emptyMsg.style.display = 'none';
+        });
+    });
+    
+    // 确保检测完成后，文件仍然保存在input中（用于重新检测）
+    // 当检测结果返回时，如果input为空但之前有文件，恢复文件选择
+    window.addEventListener('load', function() {
+        // 如果页面有检测结果但没有文件选择，尝试恢复
+        const hasResult = (detectionImg && detectionImg.src && detectionImg.src.trim() !== '' && detectionImg.src !== window.location.href) ||
+                         (detectionImgSingle && detectionImgSingle.src && detectionImgSingle.src.trim() !== '' && detectionImgSingle.src !== window.location.href);
+        
+        if (hasResult && !fileInput.files[0] && savedFile) {
+            // 恢复文件选择
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(savedFile);
+            fileInput.files = dataTransfer.files;
+            if (fileName) fileName.textContent = savedFileName;
+            if (fileSelected) fileSelected.style.display = 'block';
+        }
     });
 </script>
 </body>

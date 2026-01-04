@@ -175,8 +175,16 @@ def predict():
                 "error": "无法获取图片"
             }), 400
         
-        # 执行推理（使用更严格的NMS去重）
-        results = model(image, conf=0.25, iou=0.5)  # conf: 置信度阈值, iou: NMS的IoU阈值（提高以减少重复）
+        # 获取检测参数（从请求中获取，如果没有则使用默认值）
+        conf_threshold = float(request.form.get('conf', 0.25) if request.form else request.get_json().get('conf', 0.25) if request.is_json else 0.25)
+        iou_threshold = float(request.form.get('iou', 0.5) if request.form else request.get_json().get('iou', 0.5) if request.is_json else 0.5)
+        
+        # 限制参数范围
+        conf_threshold = max(0.1, min(0.99, conf_threshold))
+        iou_threshold = max(0.1, min(0.99, iou_threshold))
+        
+        # 执行推理（使用动态参数）
+        results = model(image, conf=conf_threshold, iou=iou_threshold)
         
         # 获取模型的实际类别名称（如果模型有自定义类别）
         model_class_names = model.names if hasattr(model, 'names') else class_names
@@ -203,22 +211,21 @@ def predict():
                     "bbox": [x1, y1, x2, y2]
                 })
         
-        # 使用IoU进行去重：对于相同类别且IoU>0.5的检测，只保留置信度最高的
+        # 使用IoU进行去重：对于相同类别且IoU>iou_threshold的检测，只保留置信度最高的
         detections = []
         for i, det1 in enumerate(raw_detections):
             is_duplicate = False
             for j, det2 in enumerate(raw_detections):
                 if i == j:
                     continue
-                # 相同类别且IoU大于0.5，认为是重复检测
+                # 相同类别且IoU大于阈值，认为是重复检测
                 if det1["class_name"] == det2["class_name"]:
                     iou = calculate_iou(det1["bbox"], det2["bbox"])
-                    if iou > 0.5:
+                    if iou > iou_threshold:
                         # 如果当前检测的置信度更低，跳过
                         if det1["confidence"] < det2["confidence"]:
                             is_duplicate = True
                             break
-                        # 如果当前检测的置信度更高，移除另一个（稍后处理）
             
             if not is_duplicate:
                 detections.append({
@@ -233,15 +240,24 @@ def predict():
                     }
                 })
         
+        # 统计检测结果
+        total_count = len(detections)
+        danger_count = sum(1 for d in detections if d["class_name"] != "normal_driving")
+        safe_count = total_count - danger_count
+        
         # 返回结果
         return jsonify({
             "success": True,
             "detections": detections,
-            "count": len(detections),
+            "count": total_count,
+            "danger_count": danger_count,
+            "safe_count": safe_count,
             "image_shape": {
                 "height": image.shape[0],
                 "width": image.shape[1]
-            }
+            },
+            "conf_threshold": conf_threshold,
+            "iou_threshold": iou_threshold
         })
     
     except Exception as e:
@@ -255,6 +271,7 @@ def predict_with_image():
     """
     返回带标注的图片（base64编码）
     方便前端直接显示结果
+    支持动态调整置信度和IoU阈值
     """
     try:
         if model is None:
@@ -286,8 +303,16 @@ def predict_with_image():
                 "error": "无法获取图片"
             }), 400
         
-        # 执行推理（使用更严格的NMS去重）
-        results = model(image, conf=0.25, iou=0.5)  # conf: 置信度阈值, iou: NMS的IoU阈值（提高以减少重复）
+        # 获取检测参数（从请求中获取，如果没有则使用默认值）
+        conf_threshold = float(request.form.get('conf', 0.25))  # 置信度阈值，默认0.25
+        iou_threshold = float(request.form.get('iou', 0.5))     # IoU阈值，默认0.5
+        
+        # 限制参数范围
+        conf_threshold = max(0.1, min(0.99, conf_threshold))
+        iou_threshold = max(0.1, min(0.99, iou_threshold))
+        
+        # 执行推理（使用动态参数）
+        results = model(image, conf=conf_threshold, iou=iou_threshold)
         
         # 获取模型的实际类别名称（如果模型有自定义类别）
         model_class_names = model.names if hasattr(model, 'names') else class_names
@@ -350,11 +375,20 @@ def predict_with_image():
         _, buffer = cv2.imencode('.jpg', annotated_image)
         image_base64 = base64.b64encode(buffer).decode('utf-8')
         
+        # 统计检测结果
+        total_count = len(detections)
+        danger_count = sum(1 for d in detections if d["class_name"] != "normal_driving")
+        safe_count = total_count - danger_count
+        
         return jsonify({
             "success": True,
             "annotated_image": image_base64,
             "detections": detections,
-            "count": len(detections)
+            "count": total_count,
+            "danger_count": danger_count,
+            "safe_count": safe_count,
+            "conf_threshold": conf_threshold,
+            "iou_threshold": iou_threshold
         })
     
     except Exception as e:

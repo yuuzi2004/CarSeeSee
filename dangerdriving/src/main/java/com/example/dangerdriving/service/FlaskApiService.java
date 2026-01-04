@@ -7,7 +7,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,10 +36,16 @@ public class FlaskApiService {
      * 调用 Flask API 进行图片检测
      * 
      * @param file 上传的图片文件
+     * @param confThreshold 置信度阈值（可选，默认0.25）
+     * @param iouThreshold IoU阈值（可选，默认0.5）
      * @return 检测结果，包含标注后的图片（base64）和检测信息
      */
-    public Map<String, Object> detectImage(MultipartFile file) throws IOException {
+    public Map<String, Object> detectImage(MultipartFile file, Double confThreshold, Double iouThreshold) throws IOException {
         String url = flaskApiConfig.getPredictUrl();
+        
+        // 使用默认值
+        if (confThreshold == null) confThreshold = 0.25;
+        if (iouThreshold == null) iouThreshold = 0.5;
         
         // 创建 HTTP 客户端
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -49,11 +53,14 @@ public class FlaskApiService {
             
             // 构建 multipart/form-data 请求
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-            builder.addPart("file", new InputStreamBody(
-                new ByteArrayInputStream(file.getBytes()),
-                file.getContentType(),
+            builder.addBinaryBody("file", 
+                file.getBytes(),
+                org.apache.http.entity.ContentType.parse(file.getContentType()),
                 file.getOriginalFilename()
-            ));
+            );
+            // 添加检测参数
+            builder.addTextBody("conf", String.valueOf(confThreshold));
+            builder.addTextBody("iou", String.valueOf(iouThreshold));
             
             httpPost.setEntity(builder.build());
             
@@ -97,6 +104,10 @@ public class FlaskApiService {
                     }
                     result.put("detections", detections);
                     result.put("count", jsonNode.has("count") ? jsonNode.get("count").asInt() : 0);
+                    result.put("dangerCount", jsonNode.has("danger_count") ? jsonNode.get("danger_count").asInt() : 0);
+                    result.put("safeCount", jsonNode.has("safe_count") ? jsonNode.get("safe_count").asInt() : 0);
+                    result.put("confThreshold", jsonNode.has("conf_threshold") ? jsonNode.get("conf_threshold").asDouble() : 0.25);
+                    result.put("iouThreshold", jsonNode.has("iou_threshold") ? jsonNode.get("iou_threshold").asDouble() : 0.5);
                     result.put("success", true);
                     
                     // 判断是否有危险行为（除了 normal_driving 都是危险行为）
