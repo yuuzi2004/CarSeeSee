@@ -17,9 +17,5 @@ CUDA 11.8
 ultralytics 8.3.245
 其他依赖：numpy, opencv-python, matplotlib, tqdm
 
-数据集预处理及模型训练/  # 包含数据预处理和模型训练的Jupyter Notebook
-dangerdriving/           # Java相关项目
-flask部署/               # 模型部署
-
 
 
