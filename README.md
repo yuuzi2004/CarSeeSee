@@ -17,23 +17,11 @@ CUDA 11.8
 ultralytics 8.3.245
 其他依赖：numpy, opencv-python, matplotlib, tqdm
 
-CarSeeSee/
-├── 数据集预处理及模型训练/  # 包含数据预处理和模型训练的Jupyter Notebook
-│   ├── CAR01.ipynb
-│   └── carrrrr.ipynb
-├── dangerdriving/           # Java相关项目
-│   ├── src/
-│   ├── target/
-│   └── pom.xml
-├── flask部署/               # 模型部署
-│   ├── 训练后的模型/
-│   ├── app.py
-│   ├── best2.pt
-│   └── requirements.txt
-└── CarSeeSee.zip
+数据集预处理及模型训练/  # 包含数据预处理和模型训练的Jupyter Notebook
+dangerdriving/           # Java相关项目
+flask部署/               # 模型部署
 
-<img width="257" height="127" alt="image" src="https://github.com/user-attachments/assets/11e4b9ba-9a02-4cb8-af69-1bb5bf21e1de" />
-<img width="251" height="127" alt="image" src="https://github.com/user-attachments/assets/94593540-1e49-45e8-9989-7711538c40db" />
+
 <img width="471" height="373" alt="image" src="https://github.com/user-attachments/assets/a7ad5857-6a17-4dd5-b06a-c0e5e1e4c8e5" />
 
 
