@@ -22,7 +22,4 @@ dangerdriving/           # Java相关项目
 flask部署/               # 模型部署
 
 
-<img width="471" height="373" alt="image" src="https://github.com/user-attachments/assets/a7ad5857-6a17-4dd5-b06a-c0e5e1e4c8e5" />
-
-
 
